@@ -1,4 +1,15 @@
 
+watchmanReady = false
+function checkVariable(){
+   if ( window.jQuery){
+      watchmanReady = true;
+   }
+   else{
+      window.setTimeout("checkVariable();", 100);
+   }
+}
+checkVariable();
+
 // ---------------------------------------------------------------------------------------------
 // EXPERIMENT CODE
 // ---------------------------------------------------------------------------------------------
@@ -29,6 +40,7 @@
 
 
 
+
 function loadGlobalVisualMetas() {
 	current_host = window.location.hostname
 	url = 'http://'+current_host+':5602/elasticsearch/_mget?timeout=0&ignore_unavailable=true&preference=1523735478386'
@@ -37,6 +49,7 @@ function loadGlobalVisualMetas() {
 	$.ajax ({
 	    url: url,
 	    type: "POST",
+	    // todo this needs to be made dynamic
 	    data: JSON.stringify({"docs":[{"_index":".kibana","_type":"dashboard","_id":"Bifrost-Critical-Monitoring"}]}),
 	    dataType: "json",
 	    contentType: "application/json; charset=utf-8",
@@ -63,8 +76,6 @@ function loadGlobalVisualMetas() {
 	});
 }
 
-loadGlobalVisualMetas();
-
 
 // ------------------------
 // 2. Registering sound
@@ -87,10 +98,11 @@ function volumeDown(){
     $(".audioDemo").prop("volume",volume);
 }
 
-volumeUp()
-volumeUp()
-volumeUp()
-volumeUp()
+loadGlobalVisualMetas();
+volumeUp();
+volumeUp();
+volumeUp();
+volumeUp();
 
 $(".audioDemo").trigger('load');
 // $(".audioDemo").trigger('play');
@@ -446,11 +458,42 @@ function handleAlertCBClick(cb) {
 
 // -----
 // Settings add
-$("<div id='alert-settings-drop' class='config ng-scope' ng-show='configTemplate' hidden><div class='container-fluid'><h4>Watchman info:</h4><label> Status: </label>  <span id='spy_alerter_status'>STOPPED</span><br><br><h4>Controls:</h4><label> Set spy interval:<input id='spy_time_manual_input' placeholder='spy time in seconds'></label> <button type='button' onclick='startSpyAlerter()' style='background-color: #c5d8bc;/* color: white; */border-width: 2px;border-color: #539234;width: 183px;'>Enable custom interval</button> <button type='button' onclick='syncWithAutorefreshTime()' style='background-color: #f3e6c0;/* color: white; */border-width: 2px;border-color: #c59e27;'>Sync Auto-refresh interval</button><br><br><label><input id='checkboxVisualAlerts' type='checkbox' onclick='handleAlertCBClick(this);'> Enable soft alerts</label><br><label><input id='checkboxAudioAlerts' type='checkbox' onclick='handleAlertCBClick(this);'> Enable hard alerts</label><br><br><button type='button' onclick='loadGlobalVisualMetas()' style='border-color: #c59e27;color: black;width: 113px;border-width: 2px;background-color: #f3e6c0;'>Reload configs</button> <label> Reload configs from Settings</label><br><br><button type='button' onclick='ackAlerts()' style='background-color: #9cab2c;color: white;width: 113px;'>Ack alerts</button>  <label> This will dismiss the alerts temporarily. Alerts will again get caugth in next spy interval (if still persist) </label><br><br><button type='button' onclick='lookingIntoIt()' style='background-color: #9cab2c;color: white;width: 113px;'>Looking into it!</button><label> This will dismiss all alerts. Will disable hard alerts from next spy interval. </label><br><br><button type='button' onclick='stopSpyAlerter()' style='background-color: tomato;color: white;width: 113px;'>Stop Watchman</button><label> Stop spying for alerts. </label></div><div class='config-close remove' ng-click='close()' onclick='toggleAlertSettings();'> <i class='fa fa-chevron-up'></i></div></div>").insertAfter("nav")
+$("<div id='alert-settings-drop' class='config ng-scope' ng-show='configTemplate' hidden><div class='container-fluid'><h4>Watchman info:</h4><label> Status: </label>  <span id='spy_alerter_status'>STOPPED</span><br><br><h4>Controls:</h4><label> Set spy interval:<input id='spy_time_manual_input' placeholder='spy time in seconds'></label> <button type='button' onclick='startSpyAlerter()' style='background-color: #c5d8bc;/* color: white; */border-width: 2px;border-color: #539234;width: 183px;'>Enable custom interval</button> <button type='button' onclick='syncWithAutorefreshTime()' style='background-color: #f3e6c0;/* color: white; */border-width: 2px;border-color: #c59e27;'>Sync Auto-refresh interval</button><br><br><label><input id='checkboxVisualAlerts' type='checkbox' onclick='handleAlertCBClick(this);'> Enable soft alerts</label><br><label><input id='checkboxAudioAlerts' type='checkbox' onclick='handleAlertCBClick(this);'> Enable hard alerts</label><br><br><button type='button' onclick='loadGlobalVisualMetas()' style='border-color: #c59e27;color: black;width: 113px;border-width: 2px;background-color: #f3e6c0;'>Reload configs</button> <label> Reload configs</label><br><br><button type='button' onclick='ackAlerts()' style='background-color: #9cab2c;color: white;width: 113px;'>Ack alerts</button>  <label> This will dismiss the alerts temporarily. Alerts will again get caugth in next spy interval (if still persist) </label><br><br><button type='button' onclick='lookingIntoIt()' style='background-color: #9cab2c;color: white;width: 113px;'>Looking into it!</button><label> This will dismiss all alerts. Will disable hard alerts from next spy interval. </label><br><br><button type='button' onclick='stopSpyAlerter()' style='background-color: tomato;color: white;width: 113px;'>Stop Alerter</button><label> Stop the alerter. </label></div><div class='config-close remove' ng-click='close()' onclick='toggleAlertSettings();'> <i class='fa fa-chevron-up'></i></div></div>").insertAfter("nav")
 
 // ----
 // Add Bell
 $($("ul.nav")[2]).append("<li class=\"to-body ng-scope\"><a id=\"alert-settings-ico\" onClick=\"toggleAlertSettings();\" style=\"font-size: 13px;\"><i class=\"fa fa-bell\" alt=\"Show alert settings\"></i></a></li>")
+
+
+
+// -----------
+// RULE_CONFIG
+// -----------
+
+// "meta": {
+// 	"visType": "line_graph",
+//     "gt_threshold": 15,
+//     "plots": [
+// 	    {	
+// 	    	"timePeriodInSecs": 900,
+// 	    	"lt_threshold": 20
+// 	    }
+//     ],        
+//     "include_only": [
+//     	{
+//     		"metric": "Timelogger.Controller.getSource.p95",
+//     		"gt_threshold": 200,    		
+//     		"alert_color": "tomato"
+//     	},
+//     	{
+//     		"metric": "Timelogger.Controller.getSource.p95",
+//     		"lt_threshold": 200,    		
+//     		"alert_color": "green",
+//     		"alert_tone" : "party-song.mp3"
+//     	}
+//     ],
+//     "exclude_all": []
+//   }
 
 
 
